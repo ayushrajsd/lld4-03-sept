@@ -4,6 +4,7 @@ const express = require("express");
 // create an express application
 const app = express();
 app.use(express.json());
+// app.use(express.static("public"));
 
 const loggerMiddleware = (req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
@@ -78,6 +79,20 @@ app.delete("/users/:id", (req, res) => {
 
 app.get("/special", loggerMiddleware, (req, res) => {
   res.send("special page");
+});
+
+/**
+ * Query parameters: /users?name=John
+ */
+app.get("/search", (req, res) => {
+  // access query parameters using req.query
+  const query = req.query;
+  console.log("Query parameters:", query);
+  res.send(`Your parameters are: ${JSON.stringify(query)}`);
+});
+
+app.use((req, res) => {
+  res.status(404).send("Page not found");
 });
 
 const port = 3000;
