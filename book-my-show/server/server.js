@@ -26,9 +26,15 @@ connectDB();
  * routes
  */
 const userRouter = require("./routes/userRoutes");
+const movieRouter = require("./routes/movieRouter");
 
 app.use(express.json());
+
+/**
+ * routes
+ */
 app.use("/api/users", userRouter);
+app.use("/api/movies", movieRouter);
 
 app.listen(8082, () => {
   console.log("Server started at port 8082");
