@@ -14,7 +14,9 @@ router.post("/add-theatre", async (req, res) => {
 // update theatre
 
 router.put("/update-theatre", async (req, res) => {
+  console.log("theatre body", req.body);
   try {
+    // const theatreId = req.body._id;
     const theatre = await Theatre.findByIdAndUpdate(
       req.body.theatreId,
       req.body,
@@ -45,7 +47,7 @@ router.delete("/delete-theatre/:theatreId", async (req, res) => {
 // get all theatres for Admin route
 router.get("/get-all-theatres", async (req, res) => {
   try {
-    const allTheatres = Theatre.find().populate("owner");
+    const allTheatres = await Theatre.find().populate("owner");
     res.send({
       success: true,
       data: allTheatres,
@@ -59,7 +61,9 @@ router.get("/get-all-theatres", async (req, res) => {
 // get all theatres for a specific owner
 router.get("/get-all-theatres-by-owner/:ownerId", async (req, res) => {
   try {
-    const allTheatres = Theatre.find({ owner: req.params.ownerId });
+    console.log("owner id", req.params.ownerId);
+    const allTheatres = await Theatre.find({ owner: req.params.ownerId });
+    console.log("all theatres", allTheatres);
     res.send({
       success: true,
       data: allTheatres,
