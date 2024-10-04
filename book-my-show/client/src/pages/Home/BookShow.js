@@ -44,7 +44,7 @@ const BookShow = () => {
           <div className="screen-div"></div>
         </div>
         <ul className="seat-ul justify-content-center">
-          {Array.from(Array(rows).keys()).map((row) => {
+          {Array.from(Array(rows).keys()).map((row) =>
             Array.from(Array(columns).keys()).map((column) => {
               let seatNumber = row * columns + column + 1;
               console.log("seats", seatNumber);
@@ -60,7 +60,7 @@ const BookShow = () => {
                 console.log("rendering seats", seatNumber);
                 return (
                   <li key={seatNumber}>
-                    <button
+                    <Button
                       className={seatClass}
                       onClick={() => {
                         if (selectedSeats.includes(seatNumber)) {
@@ -73,12 +73,12 @@ const BookShow = () => {
                       }}
                     >
                       {seatNumber}
-                    </button>
+                    </Button>
                   </li>
                 );
               }
-            });
-          })}
+            })
+          )}
         </ul>
         <div className="d-flex bottom-card justify-content-between w-100 max-width-600 mx-auto mb-25px mt-3">
           <div>
