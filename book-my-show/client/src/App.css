@@ -201,8 +201,13 @@ hr {
   font-size: 13px;
   min-height: unset;
 }
-.seat-ul .seat-btn:hover {
+/* .seat-ul .seat-btn:hover {
   background-color: #f1f1f1;
+} */
+.seat-ul .seat-btn:hover {
+  color: #fff !important;
+  border-color: #02a802 !important;
+  background: #02b802 !important;
 }
 .seat-ul .seat-btn.selected {
   border-color: #02a802;
