@@ -11,6 +11,8 @@ import Partner from "./pages/Partner";
 import Profile from "./pages/Profile";
 import SingleMovie from "./pages/Home/SingleMovie";
 import BookShow from "./pages/Home/BookShow";
+import Forget from "./pages/Profile/ForgetPassword";
+import Reset from "./pages/Profile/ResetPassword";
 
 function App() {
   return (
@@ -68,6 +70,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route path="/forget" element={<Forget />} />
+            <Route path="/reset/:email" element={<Reset />} />
           </Routes>
         </BrowserRouter>
       </Provider>

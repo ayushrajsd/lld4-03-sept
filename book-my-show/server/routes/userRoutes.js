@@ -3,6 +3,7 @@ const express = require("express");
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const auth = require("../middlewares/authMiddleware");
+const EmailHelper = require("../utils/emailHelper");
 
 // register a user
 
@@ -66,6 +67,77 @@ userRouter.get("/get-current-user", auth, async (req, res) => {
   // console.log("tokens", req.headers["authorization"]);
   const user = await User.findById(req.body.userId).select("-password");
   res.send({ success: true, message: "You are authenticated", data: user });
+});
+/**
+ * otp - 1000000 - 9999999
+ */
+const otpGenerator = () => {
+  return Math.floor(Math.random() * 900000 + 100000); // 100000 -> 999999
+};
+
+userRouter.patch("/forgetpassword", async (req, res) => {
+  try {
+    /**
+     * 1. you can check for email
+     * 2. check if the email is present or not
+     * 3. if email is not present -> send a response -> user not found
+     * 4. if email is present -> generate a random otp -> send to the email
+     * 5. save the otp in the database
+     */
+
+    if (req.body.email === undefined) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email is required" });
+    }
+    const user = await User.findOne({ email: req.body.email });
+    if (user == null) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+    const otp = otpGenerator();
+    user.otp = otp;
+    user.otpExpiry = Date.now() + 10 * 60 * 1000; // 10 minutes
+    await user.save();
+    // send the otp to the user
+    await EmailHelper("otp.html", user.email, { name: user.name, otp: otp });
+    res.status(200).json({ success: true, message: "OTP sent successfully" });
+  } catch (err) {
+    res.status(400).send({ message: err.message });
+  }
+});
+
+userRouter.patch("/reset/:email", async (req, res) => {
+  // -> otp
+  // new password
+  // email -> params
+  try {
+    const resetDetails = req.body;
+    if (!resetDetails.otp || !resetDetails.password) {
+      return res.status(400).send({ message: "OTP and Password is required" });
+    }
+    const user = await User.findOne({ email: req.params.email });
+    if (user === null) {
+      return res.status(404).send({ message: "User not found" });
+    }
+    // if otp is expired
+    if (Date.now() > user.otpExpiry) {
+      return res.status(400).json({ success: false, message: "OTP expired" });
+    }
+    if (user.otp !== resetDetails.otp) {
+      return res.status(400).json({ success: false, message: "Invalid OTP" });
+    }
+    user.password = resetDetails.password;
+    user.otp = undefined;
+    user.otpExpiry = undefined;
+    await user.save();
+    res
+      .status(200)
+      .json({ success: true, message: "Password reset successful" });
+  } catch (err) {
+    res.status(400).send({ message: err.message });
+  }
 });
 
 module.exports = userRouter;
