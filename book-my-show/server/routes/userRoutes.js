@@ -4,6 +4,7 @@ const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const auth = require("../middlewares/authMiddleware");
 const EmailHelper = require("../utils/emailHelper");
+const bcrypt = require("bcrypt");
 
 // register a user
 
@@ -19,7 +20,15 @@ userRouter.post("/register", async (req, res) => {
         message: "User already exists",
       });
     }
-    const newUser = new User(req.body);
+    // hash the password
+
+    const saltRounds = 10; // the higher the number, the more secure but slower the hashing process
+    const hashedPassword = await bcrypt.hash(req.body.password, saltRounds);
+    const newUser = new User({
+      ...req.body,
+      password: hashedPassword,
+    });
+
     await newUser.save();
 
     res.send({
@@ -32,6 +41,17 @@ userRouter.post("/register", async (req, res) => {
   }
 });
 
+async function hashPassword(password) {
+  console.time("time taken");
+  const salt = await bcrypt.genSalt(14);
+  console.log("Salt:", salt);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  console.log("Hashed Password:", hashedPassword);
+  console.timeEnd("time taken");
+  console.log("*******************");
+  return hashPassword;
+}
+
 userRouter.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email }); //{name:"Swapna", email:"swapna", password:"swapna"}
@@ -42,12 +62,21 @@ userRouter.post("/login", async (req, res) => {
       });
     }
 
-    if (req.body.password !== user.password) {
+    // if (req.body.password !== user.password) {
+    //   return res.send({
+    //     success: false,
+    //     message: "Invalid password",
+    //   });
+    // }
+    const isMatch = await bcrypt.compare(req.body.password, user.password);
+    if (!isMatch) {
       return res.send({
         success: false,
         message: "Invalid password",
       });
     }
+    const password = "Ayush@123";
+    hashPassword(password);
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
