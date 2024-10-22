@@ -30,6 +30,12 @@ const movieRouter = require("./routes/movieRouter");
 const theatreRouter = require("./routes/theatreRouter");
 
 app.use(express.json());
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes).
+  message: "Too many requests from this IP, please try again after 15 minutes",
+});
+app.use("/api/", limiter);
 
 /**
  * routes
@@ -43,3 +49,16 @@ app.use("/api/bookings", require("./routes/bookingRouter"));
 app.listen(8082, () => {
   console.log("Server started at port 8082");
 });
+
+/**
+ * username and password
+ * const user = await Users.findOne({username:req.body.username, password:req.body.password})
+ *
+ * {
+ * userName:{$gt:""},
+ * "password":{$gt:""}
+ * }
+ *
+ *
+ *
+ */
