@@ -7,3 +7,9 @@ console.log(os.platform());
 console.log(os.arch());
 console.log("release", os.release());
 console.log(os.networkInterfaces());
+
+/**
+ * 
+ * path.extName
+ * fs.copyFile
+ */
